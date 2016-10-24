@@ -9,34 +9,36 @@ class TwitchWrapper:
 
     @classmethod
     def start_chat(self):
-        # Settings
-        # IRC
-        server = "irc.chat.twitch.tv"
+        # IRC Settings
+        server = 'irc.chat.twitch.tv'
         port = 443
-        channel = "#itssofrosty"
-        nickname = "tdoshea90"
-        password = os.environ.get('TWITCH_TOKEN')
+        channel = '#acetv'
+        nickname = 'tdoshea90'
+        auth_token = os.environ.get('TWITCH_TOKEN')
 
         irc_C = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # defines the socket
         irc = ssl.wrap_socket(irc_C)
 
-        msg_regex = re.compile(".+PRIVMSG %s :" % channel)
+        msg_regex = re.compile('.+PRIVMSG %s :' % channel)
 
-        print("Establishing connection to [%s]" % (server))
-        # Connect
+        print('Establishing connection to [%s]' % (server))
         irc.connect((server, port))
         irc.setblocking(False)
-        irc.send("PASS %s\n" % (password))
-        irc.send("NICK " + nickname + "\n")
-        irc.send("JOIN " + channel + "\n")
+        irc.send(('PASS %s\n' % auth_token).encode('utf-8'))
+        irc.send(('NICK ' + nickname + '\n').encode('utf-8'))
+        irc.send(('JOIN ' + channel + '\n').encode('utf-8'))
 
         while True:
             try:
-                text = irc.recv(1024)
-                print(re.sub(msg_regex, '', text))
+                data = irc.recv(1024)
+                if (len(data) < 1):
+                    print('Connection terminated')
+                    break
+
+                print(re.sub(msg_regex, '', data.decode('utf-8')))
 
                 # Prevent Timeout
-                if text.find('PING') != -1:
-                    irc.send('PONG ' + text.split()[1] + '\r\n')
+                if data.find('PING') != -1:
+                    irc.send(('PONG ' + data.split()[1] + '\r\n').encode('utf-8'))
             except Exception:
                 continue
