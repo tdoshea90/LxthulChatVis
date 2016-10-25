@@ -1,6 +1,9 @@
 import os
+from threading import Thread
 import time
+
 from flask import Flask, render_template, Response, request
+
 from twitch_wrapper import TwitchWrapper
 
 
@@ -9,13 +12,14 @@ app = application
 app.secret_key = os.environ.get('APP_SECRET_KEY')
 
 twitch_wrapper = TwitchWrapper()
-# twitch_wrapper.start_chat()
 
 
 @app.route('/')
 def home():
     # streaming: http://flask.pocoo.org/docs/0.11/patterns/streaming/
     if request.headers.get('accept') == 'text/event-stream':
+        print('client accepts event-stream')
+
         def events():
             for i in range(0, 10):
                 print('doing the thing')
@@ -37,5 +41,6 @@ def page_not_found(error):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
-#     app.run()
+    twitch_thread = Thread(target=twitch_wrapper.start_chat)
+    twitch_thread.start()
+    app.run()

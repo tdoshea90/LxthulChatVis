@@ -7,12 +7,11 @@ import ssl
 class TwitchWrapper:
     """ Stream the chat """
 
-    @classmethod
     def start_chat(self):
         # IRC Settings
         server = 'irc.chat.twitch.tv'
         port = 443
-        channel = '#acetv'
+        channel = '#lxthul'
         nickname = 'tdoshea90'
         auth_token = os.environ.get('TWITCH_TOKEN')
 

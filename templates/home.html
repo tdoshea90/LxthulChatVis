@@ -6,6 +6,7 @@
 <p>Worst chat on Twitch</p>
 
 <div class="container">
+    <ol id="streamTest"></ol>
     <div id="wordcloudTab"></div>
 </div>
 
@@ -20,7 +21,7 @@ $(function() {
             console.log(e.id);
             console.log("A message has arrived!");
             var newElement = "<li>message: " + e.data + "</li>";
-            $("#wordcloudTab").append(newElement);
+            $("#streamTest").append(newElement);
 
             if (e.id == "CLOSE") {
                 eventSource.close();
