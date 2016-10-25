@@ -1,6 +1,6 @@
 import os
+from queue import Queue
 from threading import Thread
-import time
 
 from flask import Flask, render_template, Response, request
 
@@ -11,7 +11,8 @@ application = Flask(__name__)
 app = application
 app.secret_key = os.environ.get('APP_SECRET_KEY')
 
-twitch_wrapper = TwitchWrapper()
+msg_queue = Queue()
+twitch_wrapper = TwitchWrapper(msg_queue)
 
 
 @app.route('/')
@@ -23,11 +24,11 @@ def home():
 
 
 def events():
-    for i in range(0, 10):
+    while True:
+        msg = msg_queue.get()
         # this format is REQUIRED. 'data: blah\n\n'
         # https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
-        yield ('data: %d\n\n' % i)
-        time.sleep(1)
+        yield ('data: %s\n\n' % msg)
 
 
 @app.route('/about/')

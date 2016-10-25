@@ -17,7 +17,7 @@ $(function() {
     if (!!window.EventSource) {
         var eventSource = new EventSource("/");
         eventSource.onmessage = function(e) {
-            var newElement = "<li>message: " + e.data + "</li>";
+            var newElement = "<li>" + e.data + "</li>";
             $("#streamTest").append(newElement);
         }
 

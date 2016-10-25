@@ -7,8 +7,14 @@ import ssl
 class TwitchWrapper:
     """ Stream the chat """
 
+    msg_queue = None
+
+    def __init__(self, msg_queue):
+        self.msg_queue = msg_queue
+
     def start_chat(self):
-        # IRC Settings
+        """ https://github.com/justintv/Twitch-API/blob/master/IRC.md """
+
         server = 'irc.chat.twitch.tv'
         port = 443
         channel = '#lxthul'
@@ -20,7 +26,6 @@ class TwitchWrapper:
 
         msg_regex = re.compile('.+PRIVMSG %s :' % channel)
 
-        print('Establishing connection to [%s]' % (server))
         irc.connect((server, port))
         irc.setblocking(False)
         irc.send(('PASS %s\n' % auth_token).encode('utf-8'))
@@ -29,12 +34,15 @@ class TwitchWrapper:
 
         while True:
             try:
-                data = irc.recv(1024)
+                data_encoded = irc.recv(1024)
+                data = data_encoded.decode('utf-8')
                 if (len(data) < 1):
-                    print('Connection terminated')
                     break
 
-                print(re.sub(msg_regex, '', data.decode('utf-8')))
+                if data.find('PRIVMSG') != -1:
+                    msg = re.sub(msg_regex, '', data)
+                    self.msg_queue.put(msg)
+                    print(msg)
 
                 # Prevent Timeout
                 if data.find('PING') != -1:
