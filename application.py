@@ -26,6 +26,11 @@ def home():
     return render_template('home.html', title='Lxthul Chat')
 
 
+@app.route('/about/')
+def about():
+    return render_template('about.html', title='About')
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('page_not_found.html', title='404'), 404

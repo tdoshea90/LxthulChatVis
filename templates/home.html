@@ -14,11 +14,17 @@
 $(function() {
     // Events
     if (!!window.EventSource) {
-        var eventSource = new EventSource("http://127.0.0.1:5000");
+        console.log("window event source");
+        var eventSource = new EventSource("/");
         eventSource.onmessage = function(e) {
+            console.log(e.id);
             console.log("A message has arrived!");
             var newElement = "<li>message: " + e.data + "</li>";
             $("#wordcloudTab").append(newElement);
+
+            if (e.id == "CLOSE") {
+                eventSource.close();
+            }
         }
 
         eventSource.addEventListener('message', function(e) {
