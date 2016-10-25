@@ -11,6 +11,18 @@
 </div>
 
 <script type="text/javascript">
+function regexify(message) {
+    // Remove @ users
+    cleanMessage = message.replace(/@[a-zA-z0-9_]{3,24}(?=\s|$)/gi, "");
+    // Remove links
+    cleanMessage = cleanMessage.replace(/(http|https):\/\/\S+/gi, "");
+    // Remove special chars except ! because it is Twitch specific
+    cleanMessage = cleanMessage.replace(/[^A-Za-z !]/g, "");
+    // Remove stopwords
+    cleanMessage = cleanMessage.replace(getStopWords(), "");
+    return cleanMessage;
+}
+
 // On screen load
 $(function() {
     // Events
@@ -18,7 +30,10 @@ $(function() {
         var eventSource = new EventSource("/");
         eventSource.onmessage = function(e) {
             var newElement = "<li>" + e.data + "</li>";
-            $("#streamTest").append(newElement);
+//             $("#streamTest").append(newElement);
+
+            var cleanMessage = regexify(e.data);
+            console.log(cleanMessage);
         }
 
     }
