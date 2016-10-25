@@ -18,16 +18,16 @@ twitch_wrapper = TwitchWrapper()
 def home():
     # streaming: http://flask.pocoo.org/docs/0.11/patterns/streaming/
     if request.headers.get('accept') == 'text/event-stream':
-        print('client accepts event-stream')
-
-        def events():
-            for i in range(0, 10):
-                print('doing the thing')
-                yield ('data: %d\n' % i)
-                time.sleep(1)
-        # https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
         return Response(events(), content_type='text/event-stream')
     return render_template('home.html', title='Lxthul Chat')
+
+
+def events():
+    for i in range(0, 10):
+        # this format is REQUIRED. 'data: blah\n\n'
+        # https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
+        yield ('data: %d\n\n' % i)
+        time.sleep(1)
 
 
 @app.route('/about/')

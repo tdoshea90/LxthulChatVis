@@ -15,36 +15,12 @@
 $(function() {
     // Events
     if (!!window.EventSource) {
-        console.log("window event source");
         var eventSource = new EventSource("/");
         eventSource.onmessage = function(e) {
-            console.log(e.id);
-            console.log("A message has arrived!");
             var newElement = "<li>message: " + e.data + "</li>";
             $("#streamTest").append(newElement);
-
-            if (e.id == "CLOSE") {
-                eventSource.close();
-            }
         }
 
-        eventSource.addEventListener('message', function(e) {
-            console.log("new message");
-            console.log(e.data);
-        }, false);
-
-        eventSource.addEventListener('open', function(e) {
-            // Connection was opened.
-            console.log("connection opened");
-        }, false);
-
-        eventSource.addEventListener('error', function(e) {
-            if (e.readyState == EventSource.CLOSED) {
-                console.log("connection closed");
-            }
-        }, false);
-    } else {
-        console.log("what");
     }
 
     //////////////////////////////////////////////////////////////
