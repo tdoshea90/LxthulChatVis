@@ -3,11 +3,9 @@
 
 <span id="fontSizeTest"></span>
 
-<p>Worst chat on Twitch</p>
-
 <div class="container">
-    <ol id="streamTest"></ol>
     <div id="wordcloudTab"></div>
+    <ol id="streamTest"></ol>
 </div>
 
 <script type="text/javascript">
@@ -22,26 +20,44 @@ function regexify(message) {
     cleanMessage = cleanMessage.replace(/\w+!/g);
     // Remove stopwords
     cleanMessage = cleanMessage.replace(getStopWords(), "");
-    return cleanMessage;
+    return cleanMessage.toUpperCase().split(/ +/);
 }
 
 // On screen load
 $(function() {
+    var wordMap = {};
+
     // Events
     if (!!window.EventSource) {
         var eventSource = new EventSource("/");
         eventSource.onmessage = function(e) {
-            var newElement = "<li>" + e.data + "</li>";
-//             $("#streamTest").append(newElement);
-
             var cleanMessage = regexify(e.data);
-            console.log(cleanMessage);
+            for (i = 0; i < cleanMessage.length; i++) {
+                var word = cleanMessage[i];
+                if (word.length > 1) {
+                    if (word in wordMap) {
+                        var wordFrequency = wordMap[word];
+                        wordMap[word] = wordFrequency + 1;
+                    } else {
+                        wordMap[word] = 1;
+                    }
+                 }
+            }
         }
 
     }
 
-    //////////////////////////////////////////////////////////////
-//     var wordMap = {# {{ get_ticker_response.word_map|tojson }} #}
+    setInterval(function() {
+        var sortedFrequencyList = buildFrequencyList(wordMap);
+        $("#streamTest").empty();
+        for (i = 0; i < sortedFrequencyList.length; i++) {
+            var word = sortedFrequencyList[i];
+            var newElement = "<li>" + word.text + " : " + word.size + "</li>";
+            $("#streamTest").append(newElement);
+        }
+    }, 10000);   // 10 seconds
+
+    ///////////////////////////////////////////////////////////
 //     var sortedFrequencyList = buildFrequencyList(wordMap);
 //
 //     var cloudDiv = document.getElementById("wordcloudTab");
@@ -99,24 +115,24 @@ $(function() {
 });
 
 // Transform into the form that d3 cloud needs
-// function buildFrequencyList(wordMap) {
-//     var sortedFrequencyList = [];
-//     for (var word in wordMap) {
-//         var wordFrequency = wordMap[word];
-//         var wordFrequencyMap = {
-//             text: word,
-//             size: wordFrequency
-//         };
-//
-//         // TODO: adjust this subjectively or sort and choose top X but which will be computationaly expensive
-//         // TODO: do this server side too once we get more data. send down less to the client. 50 words max?
-//         if (wordFrequency > 1) {
-//             binaryInsert(wordFrequencyMap, sortedFrequencyList);
-//         }
-//     }
-//
-//     return sortedFrequencyList;
-// }
+function buildFrequencyList(wordMap) {
+    var sortedFrequencyList = [];
+    for (var word in wordMap) {
+        var wordFrequency = wordMap[word];
+        var wordFrequencyMap = {
+            text: word,
+            size: wordFrequency
+        };
+
+        // TODO: adjust this subjectively or sort and choose top X but which will be computationaly expensive
+        // TODO: do this server side too once we get more data. send down less to the client. 50 words max?
+        if (wordFrequency > 1) {
+            binaryInsert(wordFrequencyMap, sortedFrequencyList);
+        }
+    }
+
+    return sortedFrequencyList.slice(0, 50);
+}
 </script>
 
 {% endblock %}
