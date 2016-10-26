@@ -13,11 +13,13 @@
 <script type="text/javascript">
 function regexify(message) {
     // Remove @ users
-    cleanMessage = message.replace(/@[a-zA-z0-9_]{3,24}(?=\s|$)/gi, "");
+    cleanMessage = message.replace(/@[a-zA-z0-9_]{3,24}(?=\s|$)/g, "");
     // Remove links
     cleanMessage = cleanMessage.replace(/(http|https):\/\/\S+/gi, "");
     // Remove special chars except ! because it is Twitch specific
     cleanMessage = cleanMessage.replace(/[^A-Za-z !]/g, "");
+    // Remove words that aren't commands like !series. side effect of above regex.
+    cleanMessage = cleanMessage.replace(/\w+!/g);
     // Remove stopwords
     cleanMessage = cleanMessage.replace(getStopWords(), "");
     return cleanMessage;
