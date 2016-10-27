@@ -17,7 +17,7 @@ class TwitchWrapper:
 
         server = 'irc.chat.twitch.tv'
         port = 443
-        channel = '#lxthul'
+        channel = '#halo'
         nickname = 'tdoshea90'
         auth_token = os.environ.get('TWITCH_TOKEN')
 
@@ -42,7 +42,7 @@ class TwitchWrapper:
                 if data.find('PRIVMSG') != -1:
                     msg = re.sub(msg_regex, '', data)
                     self.msg_queue.put(msg)
-                    print(msg)
+                    # print(msg)
 
                 # Prevent Timeout
                 if data.find('PING') != -1:
