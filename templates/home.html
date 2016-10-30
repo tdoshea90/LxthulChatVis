@@ -14,13 +14,15 @@ function regexify(message) {
     cleanMessage = message.replace(/@[a-zA-z0-9_]{3,24}(?=\s|$)/g, "");
     // Remove links
     cleanMessage = cleanMessage.replace(/(http|https):\/\/\S+/gi, "");
+    // Possessive words
+    cleanMessage = cleanMessage.replace(/'S/g, "");
     // Remove special chars except ! because it is Twitch specific
     cleanMessage = cleanMessage.replace(/[^A-Za-z !]/g, "");
     // Remove words that aren't commands like !series. side effect of above regex.
     cleanMessage = cleanMessage.replace(/\w+!/g);
     // Remove stopwords
     cleanMessage = cleanMessage.replace(getStopWords(), "");
-    return cleanMessage.toUpperCase().split(/ +/);
+    return cleanMessage.split(/ +/);
 }
 
 // On screen load
@@ -31,7 +33,7 @@ $(function() {
     if (!!window.EventSource) {
         var eventSource = new EventSource("/");
         eventSource.onmessage = function(e) {
-            var cleanMessage = regexify(e.data);
+            var cleanMessage = regexify(e.data.toUpperCase());
             for (i = 0; i < cleanMessage.length; i++) {
                 var word = cleanMessage[i];
                 if (word.length > 1) {
@@ -126,6 +128,7 @@ function buildFrequencyList(wordMap) {
 
         // TODO: adjust this subjectively or sort and choose top X but which will be computationaly expensive
         // TODO: do this server side too once we get more data. send down less to the client. 50 words max?
+        // TODO: that means building the list server side and passing that instead of the map.
         if (wordFrequency > 1) {
             binaryInsert(wordFrequencyMap, sortedFrequencyList);
         }
