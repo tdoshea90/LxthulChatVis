@@ -1,9 +1,7 @@
 import os
 from queue import Queue
 from threading import Thread
-
 from flask import Flask, render_template, Response, request
-
 from twitch_wrapper import TwitchWrapper
 
 
